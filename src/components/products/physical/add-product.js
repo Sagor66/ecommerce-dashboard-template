@@ -35,6 +35,7 @@ const Add_product = () => {
   const [variants, setVariants] = useState([
     { color: "", code: "", imgId: "", size: "", stock: "", sku: "" },
   ]);
+	const [isSale, setIsSale] = useState(true)
 
   // axios.get('http://localhost:9001/api/products/all')
   // .then(data => console.log(data.data))
@@ -109,35 +110,62 @@ const Add_product = () => {
     setVariants(updatedVariants);
   };
 
+	// Sale function
+	const handleSale = e => {
+		const sale = e.target.value
+		if (sale === 'Yes') {
+			setIsSale(true)
+		} else {
+			setIsSale(false)
+		}
+	}
+
   const handleValidSubmit = (event) => {
     event.preventDefault();
     const form = event.target;
     const productName = form.product_name.value;
     const productBrand = form.product_brand.value;
+    const productId = form.product_id.value;
     const productType = form.product_type.value;
     const productCategory = form.product_category.value;
     const price = form.price.value;
     const discount = form.discount.value;
-    const sale = form.sale.value;
     const description = value;
 
     const formInputs = {
-      productName,
-      productBrand,
-      productType,
-      productCategory,
+			_id: productId,
+      name: productName,
+      brand: productBrand,
+      type: productType,
+      category: productCategory,
       price,
       discount,
-      sale,
+			new: true,
+      sale: isSale,
       reviews,
       ratings,
 			variants,
-      dummyimgs: dummyimgs,
+      images: dummyimgs,
       description,
     };
 
+		console.log(formInputs)
+
+
+		axios.post('http://localhost:9001/api/products', formInputs)
+		.then(data => {
+			if (data.insertedId) {
+				console.log('Insterted')
+			}
+			console.log(data)
+		})
+		.catch(error => console.log(error.message))
+
     console.log(formInputs);
   };
+
+
+	
 
   return (
     <Fragment>
@@ -225,6 +253,22 @@ const Add_product = () => {
                           </div>
                           <div className="valid-feedback">Looks good!</div>
                         </FormGroup>
+												{/* Product Id */}
+												<FormGroup className="form-group mb-3 row">
+                          <Label className="col-xl-3 col-sm-4 mb-0">
+                            Product Id :
+                          </Label>
+                          <div className="col-xl-8 col-sm-7">
+                            <Input
+                              className="form-control"
+                              name="product_id"
+                              id="validationCustom02"
+                              type="text"
+                              required
+                            />
+                          </div>
+                          <div className="valid-feedback">Looks good!</div>
+                        </FormGroup>
                         {/* Product Type */}
                         <FormGroup className="form-group mb-3 row">
                           <Label className="col-xl-3 col-sm-4 mb-0">
@@ -289,20 +333,22 @@ const Add_product = () => {
                           <div className="valid-feedback">Looks good!</div>
                         </FormGroup>
                         {/* Product Sale */}
-                        <FormGroup className="form-group mb-3 row">
-                          <Label className="col-xl-3 col-sm-4 mb-0">
-                            Sale :
-                          </Label>
-                          <div className="col-xl-8 col-sm-7">
-                            <Input
-                              className="form-control mb-0"
-                              name="sale"
-                              id="validationCustom02"
-                              type="number"
-                            />
-                          </div>
-                          <div className="valid-feedback">Looks good!</div>
-                        </FormGroup>
+												<FormGroup className="form-group mb-3 row">
+													<Label className="col-xl-3 col-sm-4 mb-0">
+														Sale :
+													</Label>
+													<div className="col-xl-8 col-sm-7">
+														<select
+															className="form-control digits"
+															id="exampleFormControlSelect1"
+															value={isSale}
+															onChange={handleSale}
+														>
+															<option>Yes</option>
+															<option>No</option>
+														</select>
+													</div>
+												</FormGroup>
                         {/* Product Ratings */}
                         <div>
                           {ratings.map((rating, i) => (
